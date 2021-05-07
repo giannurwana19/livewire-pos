@@ -31,6 +31,10 @@
                         @endforeach
                     </tbody>
                 </table>
+
+                <div>
+                    {{ $products->links() }}
+                </div>
             </div>
         </div>
     </div>
@@ -40,6 +44,15 @@
                 <h4>Create Product</h4>
             </div>
             <div class="card-body">
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>{{ session('success') }}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                @endif
+
                 <form wire:submit.prevent="store">
                     <div class="form-group">
                         <label for="name">Product Name</label>

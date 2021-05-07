@@ -6,12 +6,22 @@ use App\Models\Product;
 use Carbon\Carbon;
 use Darryldecode\Cart\CartCondition;
 use Darryldecode\Cart\Facades\CartFacade;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Cart extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'bootstrap';
+
     public $tax = '0%';
+    public $search = '';
+
+    public function updatingSearch() // .. 1
+    {
+        $this->resetPage();
+    }
 
     public function addItem($id)
     {
@@ -94,7 +104,7 @@ class Cart extends Component
 
     public function render()
     {
-        $products = Product::orderBy('created_at', 'desc')->get();
+        $products = $this->search == '' ? Product::orderBy('created_at', 'desc')->paginate(3) : Product::where('name', 'like', "%$this->search%")->orderBy('created_at', 'desc')->paginate(3);
 
         $condition = new CartCondition([
             'name' => 'pajak',
@@ -136,9 +146,20 @@ class Cart extends Component
         $summary = [
             'subTotal' => $subTotal,
             'pajak' => $pajak,
-            'total' => $total
+            'total' => $total,
         ];
 
         return view('livewire.cart', compact('summary', 'products', 'carts'));
     }
 }
+
+// h: DOKUMENTASI
+
+// p: 1
+// lifecycle hooks update
+// kita gunakan lifecycle update
+// search disini artinya lifecycle update hanya berlaku pada variable search
+//     public function updatingSearch()
+// {
+    // $this->resetPage();
+// }

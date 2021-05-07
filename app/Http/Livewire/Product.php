@@ -3,14 +3,16 @@
 namespace App\Http\Livewire;
 
 use App\Models\Product as ModelsProduct;
-use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class Product extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, WithPagination;
+
+    protected $paginationTheme = 'bootstrap';
 
     public $name, $image, $description, $qty, $price;
 
@@ -36,7 +38,7 @@ class Product extends Component
             'price' => $this->price
         ]);
 
-        request()->session()->flash('info', 'Product created successfully');
+        request()->session()->flash('success', 'Product created successfully');
 
         $this->clearForm();
     }
@@ -52,7 +54,7 @@ class Product extends Component
 
     public function render()
     {
-        $products = ModelsProduct::orderBy('created_at', 'desc')->get();
+        $products = ModelsProduct::orderBy('created_at', 'desc')->paginate(3);
 
         return view('livewire.product', compact('products'));
     }
