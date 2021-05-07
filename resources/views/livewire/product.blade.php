@@ -5,7 +5,7 @@
                 <h4>Product List</h4>
             </div>
             <div class="card-body">
-                <table class="table table-hover table-bordered table-striped">
+                <table class="table table-hover table-bordered">
                     <thead>
                         <tr class="text-center">
                             <th>No</th>
@@ -21,7 +21,9 @@
                         <tr>
                             <td class="text-center">{{ $index + 1 }}.</td>
                             <td>{{ $product->name }}</td>
-                            <td>{{ $product->image }}</td>
+                            <td><img src="{{ asset('storage/images') }}/{{ $product->image }}"
+                                    alt="{{ $product->name }}" width="100">
+                            </td>
                             <td>{{ $product->description }}</td>
                             <td>{{ $product->qty }}</td>
                             <td>{{ $product->price }}</td>
@@ -43,7 +45,7 @@
                         <label for="name">Product Name</label>
                         <input type="text" wire:model="name" class="form-control" id="name">
                         @error('name')
-                        <small class="text-damger">{{ $message }}</small>
+                        <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
 
@@ -53,12 +55,11 @@
                             <input type="file" wire:model="image" class="custom-file-input" id="image">
                             <label for="image" class="custom-file-label">Choose Image</label>
                             @error('image')
-                            <small class="text-damger">{{ $message }}</small>
+                            <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                         @if($image)
                         <div class="my-3">
-                            <label>Image Preview</label>
                             <img src="{{ $image->temporaryUrl() }}" class="img-fluid" alt="preview image">
                         </div>
                         @endif
@@ -67,13 +68,16 @@
                     <div class="form-group">
                         <label for="description">Description</label>
                         <textarea wire:model="description" class="form-control" id="description"></textarea>
+                        @error('description')
+                        <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
 
                     <div class="form-group">
                         <label for="qty">Quantity</label>
                         <input type="number" wire:model="qty" class="form-control" id="qty">
                         @error('qty')
-                        <small class="text-damger">{{ $message }}</small>
+                        <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
 
@@ -81,7 +85,7 @@
                         <label for="price">Price</label>
                         <input type="number" wire:model="price" class="form-control" id="price">
                         @error('price')
-                        <small class="text-damger">{{ $message }}</small>
+                        <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
 
