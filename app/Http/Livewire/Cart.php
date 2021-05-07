@@ -30,7 +30,7 @@ class Cart extends Component
             $product = Product::findOrFail($id);
 
             CartFacade::session(auth()->id())->add([
-                'id' => "Cart $product->id",
+                'id' => "Cart" . $product->id,
                 'name' => $product->name,
                 'price' => $product->price,
                 'quantity' => 1,
@@ -43,7 +43,7 @@ class Cart extends Component
 
     public function enableTax()
     {
-        $this->tax = '10%';
+        $this->tax = '5%';
     }
 
     public function disableTax()
@@ -51,6 +51,46 @@ class Cart extends Component
         $this->tax = '0%';
     }
 
+    public function decreaseItem($id)
+    {
+        $cart = CartFacade::session(auth()->id())->getContent();
+        $checkItem = $cart->whereIn('id', $id);
+
+        if ($checkItem[$id]->quantity == 1) {
+            $this->removeItem($id);
+        } else {
+            CartFacade::session(auth()->id())->update($id, [
+                'quantity' => [
+                    'relative' => true,
+                    'value' => -1
+                ]
+            ]);
+        }
+    }
+
+    public function increaseItem($id)
+    {
+        $productId = substr($id, 4, 5);
+        $product = Product::findOrFail($productId);
+        $cart = CartFacade::session(auth()->id())->getContent();
+        $checkItem = $cart->whereIn('id', $id);
+
+        if ($product->qty == $checkItem[$id]->quantity) {
+            request()->session()->flash('error', 'Jumlah item kurang!');
+        } else {
+            CartFacade::session(auth()->id())->update($id, [
+                'quantity' => [
+                    'relative' => true,
+                    'value' => 1
+                ]
+            ]);
+        }
+    }
+
+    public function removeItem($id)
+    {
+        CartFacade::session(auth()->id())->remove($id);
+    }
 
     public function render()
     {
@@ -98,7 +138,6 @@ class Cart extends Component
             'pajak' => $pajak,
             'total' => $total
         ];
-
 
         return view('livewire.cart', compact('summary', 'products', 'carts'));
     }

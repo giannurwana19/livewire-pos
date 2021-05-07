@@ -12,9 +12,10 @@
                             <div class="card-body">
                                 <img src="{{ asset('storage/images') }}/{{ $product->image }}" class="img-fluid"
                                     alt="{{ $product->name }}">
-                            </div>
-                            <div class="card-footer">
-                                <h6 class="text-center">{{ $product->name }}</h6>
+                                <h6 class="text-center mt-2 font-weight-bold">{{ $product->name }}</h6>
+                                <div class="text-center mb-1">
+                                    <span>Rp. {{ $product->price }}</span>
+                                </div>
                                 <button wire:click="addItem({{ $product->id }})"
                                     class="btn btn-primary btn-sm btn-block">Add to
                                     cart</button>
@@ -33,26 +34,47 @@
                 <h4>Carts</h4>
             </div>
             <div class="card-body">
-                <table class="table table-sm table-bordered table-striped table-hover">
+                @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
+
+                <table class="table table-sm table-bordered table-hover">
                     <thead>
-                        <tr>
+                        <tr class="text-center">
                             <th>No</th>
                             <th>Name</th>
-                            <th>Quantity</th>
+                            <th>Qty</th>
                             <th>Price</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($carts as $index => $cart)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $cart['name'] }}</td>
-                            <td>{{ $cart['qty'] }}</td>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td>
+                                {{ $cart['name'] }}
+                            </td>
+                            <td width="50">{{ $cart['qty'] }}</td>
                             <td>{{ $cart['price'] }}</td>
+                            <td class="text-center">
+                                <button class="btn btn-outline-success btn-sm"
+                                    wire:click="decreaseItem('{{ $cart['rowId'] }}')">
+                                    <strong>-</strong>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm"
+                                    wire:click="increaseItem('{{ $cart['rowId'] }}')">
+                                    <strong>+</strong>
+                                </button>
+                                <button wire:click="removeItem('{{ $cart['rowId'] }}')"
+                                    class="btn btn-outline-danger btn-sm">
+                                    <strong>x</strong>
+                                </button>
+                            </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4">
+                            <td colspan="5">
                                 <h6 class="text-center">Empty Cart</h6>
                             </td>
                         </tr>
