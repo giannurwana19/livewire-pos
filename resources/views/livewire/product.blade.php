@@ -102,7 +102,8 @@
                         @enderror
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">Create Product</button>
+                    <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-save"></i> Create
+                        Product</button>
                 </form>
             </div>
         </div>

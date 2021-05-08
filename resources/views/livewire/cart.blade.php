@@ -21,7 +21,7 @@
                                 <p class="text-center mb-n1">Rp {{ number_format($product->price, 0, '.', ',') }}</p>
                                 <p class="text-center mb-1">stock : {{ $product->qty }}</p>
                                 <button wire:click="addItem({{ $product->id }})"
-                                    class="btn btn-success btn-sm btn-block">Add to
+                                    class="btn btn-success btn-sm btn-block"><i class="fas fa-cart-plus"></i> Add to
                                     cart</button>
                             </div>
                         </div>
@@ -69,15 +69,15 @@
                             <td class="text-center">
                                 <button class="btn btn-outline-success btn-sm"
                                     wire:click="decreaseItem('{{ $cart['rowId'] }}')">
-                                    <strong>-</strong>
+                                    <i class="fas fa-minus"></i>
                                 </button>
                                 <button class="btn btn-outline-success btn-sm"
                                     wire:click="increaseItem('{{ $cart['rowId'] }}')">
-                                    <strong>+</strong>
+                                    <i class="fas fa-plus"></i>
                                 </button>
                                 <button wire:click="removeItem('{{ $cart['rowId'] }}')"
                                     class="btn btn-outline-danger btn-sm">
-                                    <strong>x</strong>
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </td>
                         </tr>
@@ -103,11 +103,13 @@
 
                 <div>
                     @if($summary['pajak'] > 0)
-                    <button wire:click="disableTax" class="btn btn-danger btn-block">Remove Tax</button>
+                    <button wire:click="disableTax" class="btn btn-danger btn-block"><i class="fas fa-tag"></i> Remove
+                        Tax</button>
                     @else
-                    <button wire:click="enableTax" class="btn btn-success btn-block">Add Tax</button>
+                    <button wire:click="enableTax" class="btn btn-success btn-block"><i class="fas fa-tag"></i> Add
+                        Tax</button>
                     @endif
-                    <button class="btn btn-primary btn-block">Save Transaction</button>
+                    <button class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Transaction</button>
                 </div>
             </div>
         </div>
