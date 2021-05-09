@@ -22,19 +22,20 @@
                             <td class="text-center">{{ $index + 1 }}.</td>
                             <td>{{ $product->name }}</td>
                             <td><img src="{{ asset('storage/images') }}/{{ $product->image }}"
-                                    alt="{{ $product->name }}" width="100">
+                                    alt="{{ $product->name }}" width="80">
                             </td>
                             <td>{{ $product->description }}</td>
                             <td>{{ $product->qty }}</td>
                             <td>{{ $product->price }}</td>
                         </tr>
                         @endforeach
-                    </tbody>
+                </tbody>
                 </table>
 
-                <div>
-                    {{ $products->links() }}
-                </div>
+
+            </div>
+            <div class="card-footer">
+                {{ $products->links() }}
             </div>
         </div>
     </div>

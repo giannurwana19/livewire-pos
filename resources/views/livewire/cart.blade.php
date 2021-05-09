@@ -13,16 +13,19 @@
                 <div class="row">
                     @forelse($products as $product)
                     <div class="col-lg-4 col-md-6 col-sm-6">
-                        <div class="card mb-2">
+                        <div class="card mb-2" style="cursor: pointer" title="add to cart"
+                            wire:click="addItem({{ $product->id }})">
                             <div class="card-body">
-                                <img src="{{ asset('storage/images') }}/{{ $product->image }}" class="img-fluid"
+                                <img src="{{ asset('storage/images') }}/{{ $product->image }}" class="img-fluid mt-4"
                                     alt="{{ $product->name }}">
                                 <h6 class="text-center mt-2 font-weight-bold">{{ $product->name }}</h6>
                                 <p class="text-center mb-n1">Rp {{ number_format($product->price, 0, '.', ',') }}</p>
                                 <p class="text-center mb-1">stock : {{ $product->qty }}</p>
                                 <button wire:click="addItem({{ $product->id }})"
-                                    class="btn btn-success btn-sm btn-block"><i class="fas fa-cart-plus"></i> Add to
-                                    cart</button>
+                                    class="btn btn-primary btn-sm position-absolute"
+                                    style="top: 0; right: 0; padding: 5px 10px">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -30,9 +33,10 @@
                     <h4>No Products Found!</h4>
                     @endforelse
                 </div>
-                <div class="d-flex justify-content-center">
-                    {{ $products->links() }}
-                </div>
+            </div>
+
+            <div class="card-footer">
+                {{ $products->links() }}
             </div>
         </div>
     </div>
@@ -54,32 +58,34 @@
                             <th>Name</th>
                             <th>Qty</th>
                             <th>Price</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($carts as $index => $cart)
                         <tr>
-                            <td class="text-center">{{ $index + 1 }}</td>
-                            <td>
-                                {{ $cart['name'] }}
-                            </td>
-                            <td width="50">{{ $cart['qty'] }}</td>
-                            <td>Rp {{ number_format($cart['price'], 0, '.', ',') }}</td>
                             <td class="text-center">
-                                <button class="btn btn-outline-success btn-sm"
-                                    wire:click="decreaseItem('{{ $cart['rowId'] }}')">
+                                {{ $index + 1 }}
+                                <button wire:click="removeItem('{{ $cart['rowId'] }}')" class="btn btn-danger btn-sm"
+                                    style="padding: 0 6px">
+                                    <i class="fas fa-trash"></i>
+                                </button></td>
+                            <td>
+                                <strong>{{ $cart['name'] }} </strong>
+                                <br> Rp {{number_format($cart['priceSingle'], 0, '.', ',') }}
+
+                            </td>
+                            <td class="text-center">
+                                <button wire:click="decreaseItem('{{ $cart['rowId'] }}')" class="btn btn-success btn-sm"
+                                    style="padding: 0 6px">
                                     <i class="fas fa-minus"></i>
                                 </button>
-                                <button class="btn btn-outline-success btn-sm"
-                                    wire:click="increaseItem('{{ $cart['rowId'] }}')">
+                                {{ $cart['qty'] }}
+                                <button wire:click="increaseItem('{{ $cart['rowId'] }}')" class="btn btn-success btn-sm"
+                                    style="padding: 0 6px">
                                     <i class="fas fa-plus"></i>
                                 </button>
-                                <button wire:click="removeItem('{{ $cart['rowId'] }}')"
-                                    class="btn btn-outline-danger btn-sm">
-                                    <i class="fas fa-trash"></i>
-                                </button>
                             </td>
+                            <td>Rp{{ number_format($cart['price'], 0, '.', ',') }}</td>
                         </tr>
                         @empty
                         <tr>
@@ -98,16 +104,18 @@
                 <h4>Cart Summary</h4>
                 <h5>Sub Total: {{ number_format($summary['subTotal'], 0, '.', ',') }}</h5>
 
-                <h5>Tax: {{ number_format($summary['pajak'], 0, '.', ',') }}</h5>
+                <h5>Tax (2%): {{ number_format($summary['pajak'], 0, '.', ',') }}</h5>
                 <h5>Total: {{ number_format($summary['total'], 0, '.', ',') }}</h5>
 
                 <div>
                     @if($summary['pajak'] > 0)
-                    <button wire:click="disableTax" class="btn btn-danger btn-block"><i class="fas fa-tag"></i> Remove
-                        Tax</button>
+                    <button wire:click="disableTax" class="btn btn-danger btn-block mb-3">
+                        <i class="fas fa-tag"></i> Remove Tax
+                    </button>
                     @else
-                    <button wire:click="enableTax" class="btn btn-success btn-block"><i class="fas fa-tag"></i> Add
-                        Tax</button>
+                    <button wire:click="enableTax" class="btn btn-success btn-block mb-3">
+                        <i class="fas fa-tag"></i> Add Tax
+                    </button>
                     @endif
                     <button class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Transaction</button>
                 </div>

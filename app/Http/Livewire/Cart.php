@@ -25,19 +25,24 @@ class Cart extends Component
 
     public function addItem($id)
     {
-        $rowId = "Cart $id";
+        $rowId = "Cart$id";
         $cart = CartFacade::session(auth()->id())->getContent();
-        $cekItemId = $cart->whereIn('id', $rowId);
+        $checkItem = $cart->whereIn('id', $rowId);
 
-        if ($cekItemId->isNotEmpty()) {
-            CartFacade::session(auth()->id())->update($rowId, [
-                'quantity' => [
-                    'relative' => true,
-                    'value' => 1
-                ]
-            ]);
+        $product = Product::findOrFail($id);
+
+        if ($checkItem->isNotEmpty()) {
+            if ($product->qty == $checkItem[$rowId]->quantity) {
+                request()->session()->flash('error', 'Jumlah item Habis!');
+            } else {
+                CartFacade::session(auth()->id())->update($rowId, [
+                    'quantity' => [
+                        'relative' => true,
+                        'value' => 1
+                    ]
+                ]);
+            }
         } else {
-            $product = Product::findOrFail($id);
 
             CartFacade::session(auth()->id())->add([
                 'id' => "Cart" . $product->id,
@@ -53,7 +58,7 @@ class Cart extends Component
 
     public function enableTax()
     {
-        $this->tax = '5%';
+        $this->tax = '2%';
     }
 
     public function disableTax()
@@ -86,7 +91,7 @@ class Cart extends Component
         $checkItem = $cart->whereIn('id', $id);
 
         if ($product->qty == $checkItem[$id]->quantity) {
-            request()->session()->flash('error', 'Jumlah item kurang!');
+            request()->session()->flash('error', 'Jumlah item Habis!');
         } else {
             CartFacade::session(auth()->id())->update($id, [
                 'quantity' => [
