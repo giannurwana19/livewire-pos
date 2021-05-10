@@ -17,6 +17,7 @@ class Cart extends Component
 
     public $tax = '0%';
     public $search = '';
+    public $payment = 0;
 
     public function updatingSearch() // .. 1
     {
@@ -105,6 +106,11 @@ class Cart extends Component
     public function removeItem($id)
     {
         CartFacade::session(auth()->id())->remove($id);
+    }
+
+    public function saveTransaction()
+    {
+        dd('save transaction', $this->payment);
     }
 
     public function render()

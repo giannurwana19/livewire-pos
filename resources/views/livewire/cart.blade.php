@@ -30,7 +30,9 @@
                         </div>
                     </div>
                     @empty
-                    <h4>No Products Found!</h4>
+                    <div class="col-lg-4 col-md-6 col-sm-6">
+                        <h4>No Products Found!</h4>
+                    </div>
                     @endforelse
                 </div>
             </div>
@@ -107,6 +109,8 @@
                 <h5>Tax (2%): {{ number_format($summary['pajak'], 0, '.', ',') }}</h5>
                 <h5>Total: {{ number_format($summary['total'], 0, '.', ',') }}</h5>
 
+
+
                 <div>
                     @if($summary['pajak'] > 0)
                     <button wire:click="disableTax" class="btn btn-danger btn-block mb-3">
@@ -117,9 +121,66 @@
                         <i class="fas fa-tag"></i> Add Tax
                     </button>
                     @endif
-                    <button class="btn btn-primary btn-block"><i class="fas fa-save"></i> Save Transaction</button>
+                    <div class="form-group">
+                        <input type="number" class="form-control" id="payment" placeholder="Input Customer Payment">
+                        <input type="hidden" id="total" value="{{ $summary['total'] }}">
+                    </div>
+
+                    <form wire:submit.prevent="saveTransaction">
+                        <div>
+                            <label for="">Payment</label>
+                            <h4 id="paymentText">Rp. 0</h4>
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="">Kembalian</label>
+                            <h4 id="kembalianText">Rp. 0</h4>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block" wire:ignore id="saveButton" disabled>
+                            <i class="fas fa-save"></i> Save Transaction
+                        </button>
+                    </form>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    payment.oninput = () => {
+        const paymentAmount = document.getElementById('payment').value;
+        const totalAmount = document.getElementById('total').value;
+        const kembalian = paymentAmount - totalAmount;
+
+        document.getElementById('kembalianText').innerHTML = `Rp. ${formatRupiah(kembalian)}`;
+        document.getElementById('paymentText').innerHTML = `Rp. ${formatRupiah(paymentAmount)}`;
+
+        const saveButton = document.getElementById('saveButton');
+
+        if(kembalian < 0){
+            saveButton.disabled = true;
+        }else{
+            saveButton.disabled = false;
+        }
+    }
+
+    const formatRupiah = angka => {
+        const numberString = angka.toString();
+        const split = numberString.split('.');
+
+        const sisa = split[0].length % 3;
+        let rupiah = split[0].substr(0, sisa);
+        const ribuan = split[0].substr(sisa).match(/\d{1,3}/gi);
+
+        if(ribuan){
+            const separator = sisa ? ',' : '';
+            rupiah += separator + ribuan.join(',');
+        }
+
+        return split[1] != undefined ? rupiah + '.' + split[1] : rupiah;
+    }
+</script>
+@endpush
