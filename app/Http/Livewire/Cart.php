@@ -6,8 +6,10 @@ use App\Models\Product;
 use Carbon\Carbon;
 use Darryldecode\Cart\CartCondition;
 use Darryldecode\Cart\Facades\CartFacade;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Throwable;
 
 class Cart extends Component
 {
@@ -110,7 +112,39 @@ class Cart extends Component
 
     public function saveTransaction()
     {
-        dd('save transaction', $this->payment);
+        $cartTotal = CartFacade::session(auth()->id())->getTotal();
+        $bayar = $this->payment;
+        $kembalian = (int) $bayar - (int) $cartTotal;
+
+        if ($kembalian >= 0) {
+            DB::transaction(function () {
+                DB::beginTransaction();
+                try {
+                    $allCart = CartFacade::session(auth()->id())->getContent();
+                    $filterCart = $allCart->map(function ($item) {
+                        return [
+                            'id' => substr($item->id, 4, 5),
+                            'quantity' => $item->quantity
+                        ];
+                    });
+
+                    foreach ($filterCart as $cart) {
+                        $product = Product::find($cart['id']);
+
+                        if ($product->qty === 0) {
+                            return request()->session()->flash('error', 'Jumlah item kurang');
+                        }
+
+                        $product->decrement('qty', $cart['quantity']);
+                    }
+
+                    DB::commit();
+                } catch (Throwable $e) {
+                    DB::rollBack();
+                    return request()->session()->flash('error', $e);
+                }
+            });
+        }
     }
 
     public function render()

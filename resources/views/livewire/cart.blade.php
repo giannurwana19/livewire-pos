@@ -122,19 +122,20 @@
                     </button>
                     @endif
                     <div class="form-group">
-                        <input type="number" class="form-control" id="payment" placeholder="Input Customer Payment">
+                        <input type="number" wire:model="payment" class="form-control" id="payment"
+                            placeholder="Input Customer Payment">
                         <input type="hidden" id="total" value="{{ $summary['total'] }}">
                     </div>
 
                     <form wire:submit.prevent="saveTransaction">
                         <div>
                             <label for="">Payment</label>
-                            <h4 id="paymentText">Rp. 0</h4>
+                            <h4 id="paymentText" wire:ignore>Rp. 0</h4>
                         </div>
 
                         <div class="mb-2">
                             <label for="">Kembalian</label>
-                            <h4 id="kembalianText">Rp. 0</h4>
+                            <h4 id="kembalianText" wire:ignore>Rp. 0</h4>
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-block" wire:ignore id="saveButton" disabled>
