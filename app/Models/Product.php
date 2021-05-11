@@ -15,4 +15,9 @@ class Product extends Model
      * @var array
      */
     protected $guarded = ['id'];
+
+    public function transactions()
+    {
+        return $this->belongsToMany(Transaction::class, 'invoice_number', 'invoice_number');
+    }
 }

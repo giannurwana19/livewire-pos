@@ -9,6 +9,10 @@ class Transaction extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'invoice_number';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     /**
      * The attributes that aren't mass assignable.
      *
@@ -18,6 +22,6 @@ class Transaction extends Model
 
     public function products()
     {
-        return $this->hasMany(ProductTransaction::class, 'invoice_number', 'invoice_number');
+        return $this->belongsToMany(Product::class);
     }
 }

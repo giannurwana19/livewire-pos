@@ -3,9 +3,12 @@
 namespace App\Http\Livewire;
 
 use App\Models\Product;
+use App\Models\ProductTransaction;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Darryldecode\Cart\CartCondition;
 use Darryldecode\Cart\Facades\CartFacade;
+use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -46,16 +49,19 @@ class Cart extends Component
                 ]);
             }
         } else {
-
-            CartFacade::session(auth()->id())->add([
-                'id' => "Cart" . $product->id,
-                'name' => $product->name,
-                'price' => $product->price,
-                'quantity' => 1,
-                'attributes' => [
-                    'added_at' => Carbon::now()
-                ]
-            ]);
+            if ($product->qty == 0) {
+                request()->session()->flash('error', 'Jumlah item habis!');
+            } else {
+                CartFacade::session(auth()->id())->add([
+                    'id' => "Cart" . $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'quantity' => 1,
+                    'attributes' => [
+                        'added_at' => Carbon::now()
+                    ]
+                ]);
+            }
         }
     }
 
@@ -96,18 +102,22 @@ class Cart extends Component
         if ($product->qty == $checkItem[$id]->quantity) {
             request()->session()->flash('error', 'Jumlah item Habis!');
         } else {
-            CartFacade::session(auth()->id())->update($id, [
-                'quantity' => [
-                    'relative' => true,
-                    'value' => 1
-                ]
-            ]);
+            if ($product->qty == 0) {
+                request()->session()->flash('error', 'Jumlah item habis!');
+            } else {
+                CartFacade::session(auth()->id())->update($id, [
+                    'quantity' => [
+                        'relative' => true,
+                        'value' => 1
+                    ]
+                ]);
+            }
         }
     }
 
     public function removeItem($id)
     {
-        CartFacade::session(auth()->id())->remove($id);
+        return CartFacade::session(auth()->id())->remove($id);
     }
 
     public function saveTransaction()
@@ -117,7 +127,7 @@ class Cart extends Component
         $kembalian = (int) $bayar - (int) $cartTotal;
 
         if ($kembalian >= 0) {
-            DB::transaction(function () {
+            DB::transaction(function () use ($cartTotal, $bayar) {
                 DB::beginTransaction();
                 try {
                     $allCart = CartFacade::session(auth()->id())->getContent();
@@ -137,6 +147,32 @@ class Cart extends Component
 
                         $product->decrement('qty', $cart['quantity']);
                     }
+
+                    $invoiceNumber = IdGenerator::generate([
+                        'table' => 'transactions',
+                        'length' => 10,
+                        'prefix' => 'INV',
+                        'field' => 'invoice_number'
+                    ]);
+
+                    Transaction::create([
+                        'invoice_number' => $invoiceNumber,
+                        'user_id' => auth()->id(),
+                        'pay' => $bayar,
+                        'total' => $cartTotal
+                    ]);
+
+                    foreach ($filterCart as $cart) {
+                        ProductTransaction::create([
+                            'product_id' => $cart['id'],
+                            'invoice_number' => $invoiceNumber,
+                            'qty' => $cart['quantity']
+                        ]);
+                    };
+
+                    CartFacade::session(auth()->id())->clear();
+
+                    $this->payment = 0;
 
                     DB::commit();
                 } catch (Throwable $e) {

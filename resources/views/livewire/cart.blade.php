@@ -21,8 +21,7 @@
                                 <h6 class="text-center mt-2 font-weight-bold">{{ $product->name }}</h6>
                                 <p class="text-center mb-n1">Rp {{ number_format($product->price, 0, '.', ',') }}</p>
                                 <p class="text-center mb-1">stock : {{ $product->qty }}</p>
-                                <button wire:click="addItem({{ $product->id }})"
-                                    class="btn btn-primary btn-sm position-absolute"
+                                <button class="btn btn-primary btn-sm position-absolute"
                                     style="top: 0; right: 0; padding: 5px 10px">
                                     <i class="fas fa-cart-plus"></i>
                                 </button>
